@@ -11,44 +11,79 @@ YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels"
 # Custom CSS for better UI
 st.markdown("""
 <style>
+    /* Main styling */
     .main-header {
         font-size: 2.5rem;
         color: #FF0000;
         text-align: center;
         margin-bottom: 1rem;
     }
+    
     .section-header {
         font-size: 1.5rem;
         color: #1E88E5;
         margin-top: 1.5rem;
         margin-bottom: 0.5rem;
     }
+    
     .app-description {
         background-color: #F0F8FF;
         padding: 1rem;
         border-radius: 10px;
         margin-bottom: 1.5rem;
+        color: #333;
     }
+    
     .result-card {
         background-color: #F9F9F9;
         padding: 1rem;
         border-radius: 10px;
         margin-bottom: 1rem;
         border-left: 5px solid #FF0000;
+        color: #333;
     }
+    
     .footer {
         text-align: center;
         margin-top: 2rem;
         padding: 1rem;
         background-color: #F0F0F0;
         border-radius: 10px;
+        color: #333;
     }
+    
     .metric {
         display: inline-block;
         margin-right: 1rem;
         padding: 0.3rem 0.6rem;
         background-color: #E3F2FD;
         border-radius: 5px;
+        color: #333;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .main-header {
+            font-size: 2rem;
+        }
+        
+        .section-header {
+            font-size: 1.2rem;
+        }
+        
+        .result-card {
+            padding: 0.8rem;
+        }
+    }
+    
+    /* Fix text visibility */
+    .stApp {
+        color: #333;
+    }
+    
+    /* Streamlit specific fixes */
+    .stTextArea, .stNumberInput, .stSlider {
+        color: #333;
     }
 </style>
 """, unsafe_allow_html=True)
