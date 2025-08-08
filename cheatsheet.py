@@ -8,40 +8,129 @@ YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos"
 YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels"
 
-# Streamlit App Title
-st.title("YouTube Viral Topics Tool")
+# Custom CSS for better UI
+st.markdown("""
+<style>
+    .main-header {
+        font-size: 2.5rem;
+        color: #FF0000;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    .section-header {
+        font-size: 1.5rem;
+        color: #1E88E5;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .app-description {
+        background-color: #F0F8FF;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+    .result-card {
+        background-color: #F9F9F9;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border-left: 5px solid #FF0000;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #F0F0F0;
+        border-radius: 10px;
+    }
+    .metric {
+        display: inline-block;
+        margin-right: 1rem;
+        padding: 0.3rem 0.6rem;
+        background-color: #E3F2FD;
+        border-radius: 5px;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Input Fields
-days = st.number_input("Enter Days to Search (1-30):", min_value=1, max_value=30, value=5)
+# App Header
+st.markdown("<h1 class='main-header'>🔥 YouTube Viral Topics Tool</h1>", unsafe_allow_html=True)
 
-# Dynamic keyword input
-keywords_input = st.text_area("Enter Keywords (one per line):", 
-                              height=150,
-                              help="Enter each keyword on a separate line")
+# App Description Section
+st.markdown("""
+<div class="app-description">
+    <h3>About This Tool</h3>
+    <p>This tool helps you discover trending YouTube videos from smaller channels that are gaining traction. By analyzing viral content from channels with fewer subscribers, you can identify emerging trends and topics before they become mainstream.</p>
+    
+    <h3>How to Use</h3>
+    <ol>
+        <li><b>Enter Keywords:</b> Add relevant keywords or phrases (one per line) related to topics you want to explore</li>
+        <li><b>Set Timeframe:</b> Choose how many recent days to search (1-30 days)</li>
+        <li><b>Set Subscriber Threshold:</b> Maximum subscriber count for channels to include</li>
+        <li><b>Fetch Data:</b> Click the button to find viral videos matching your criteria</li>
+    </ol>
+    
+    <h3>Why Use This Tool</h3>
+    <ul>
+        <li>🔍 <b>Discover Emerging Trends:</b> Find viral content before it becomes mainstream</li>
+        <li>📈 <b>Competitive Analysis:</b> See what's working for smaller channels</li>
+        <li>💡 <b>Content Ideas:</b> Get inspiration for your own content strategy</li>
+        <li>🎯 <b>Niche Exploration:</b> Identify underserved topics with growth potential</li>
+    </ul>
+</div>
+""", unsafe_allow_html=True)
 
-# Subscriber threshold input
-subscriber_threshold = st.number_input("Maximum Subscriber Count:", 
-                                      min_value=0, 
-                                      value=3000,
-                                      help="Only show videos from channels with fewer than this many subscribers")
+# Sidebar for inputs
+st.sidebar.markdown("<h2 class='section-header'>🔧 Search Settings</h2>", unsafe_allow_html=True)
+
+days = st.sidebar.slider("Days to Search:", min_value=1, max_value=30, value=5)
+subscriber_threshold = st.sidebar.number_input("Max Subscriber Count:", min_value=0, value=3000, step=100)
+
+st.sidebar.markdown("<h3 class='section-header'>📝 Keywords</h3>", unsafe_allow_html=True)
+keywords_input = st.sidebar.text_area(
+    "Enter keywords (one per line):",
+    height=200,
+    help="Add relevant keywords or phrases to search for"
+)
+
+# Sample keywords as placeholder
+sample_keywords = """Affair Relationship Stories
+Reddit Update
+Reddit Relationship Advice
+Reddit Cheating
+AITA Update
+Open Marriage
+True Cheating Story
+Reddit Marriage
+Surviving Infidelity"""
+
+if not keywords_input:
+    st.sidebar.info("💡 Try these sample keywords:")
+    st.sidebar.code(sample_keywords)
 
 # Fetch Data Button
-if st.button("Fetch Data"):
+fetch_button = st.sidebar.button("🔍 Fetch Viral Videos", key="fetch_button")
+
+# Main content area
+if fetch_button:
     try:
         # Process keywords from user input
         keywords = [k.strip() for k in keywords_input.split("\n") if k.strip()]
         
         if not keywords:
-            st.error("Please enter at least one keyword")
+            st.error("⚠️ Please enter at least one keyword")
             st.stop()
             
         # Calculate date range
         start_date = (datetime.utcnow() - timedelta(days=int(days))).isoformat("T") + "Z"
         all_results = []
+        progress_bar = st.progress(0)
+        status_text = st.empty()
         
         # Iterate over the list of keywords
-        for keyword in keywords:
-            st.write(f"Searching for keyword: {keyword}")
+        for i, keyword in enumerate(keywords):
+            status_text.text(f"Searching for: {keyword}")
+            progress_bar.progress((i + 1) / len(keywords))
             
             # Define search parameters
             search_params = {
@@ -60,7 +149,6 @@ if st.button("Fetch Data"):
             
             # Check if "items" key exists
             if "items" not in data or not data["items"]:
-                st.warning(f"No videos found for keyword: {keyword}")
                 continue
                 
             videos = data["items"]
@@ -68,7 +156,6 @@ if st.button("Fetch Data"):
             channel_ids = [video["snippet"]["channelId"] for video in videos if "snippet" in video and "channelId" in video["snippet"]]
             
             if not video_ids or not channel_ids:
-                st.warning(f"Skipping keyword: {keyword} due to missing video/channel data.")
                 continue
                 
             # Fetch video statistics
@@ -77,7 +164,6 @@ if st.button("Fetch Data"):
             stats_data = stats_response.json()
             
             if "items" not in stats_data or not stats_data["items"]:
-                st.warning(f"Failed to fetch video statistics for keyword: {keyword}")
                 continue
                 
             # Fetch channel statistics
@@ -86,7 +172,6 @@ if st.button("Fetch Data"):
             channel_data = channel_response.json()
             
             if "items" not in channel_data or not channel_data["items"]:
-                st.warning(f"Failed to fetch channel statistics for keyword: {keyword}")
                 continue
                 
             stats = stats_data["items"]
@@ -110,19 +195,38 @@ if st.button("Fetch Data"):
                         "Subscribers": subs
                     })
         
+        # Clear progress indicators
+        progress_bar.empty()
+        status_text.empty()
+        
         # Display results
+        st.markdown(f"<h2 class='section-header'>📊 Results ({len(all_results)} videos found)</h2>", unsafe_allow_html=True)
+        
         if all_results:
-            st.success(f"Found {len(all_results)} results across all keywords!")
+            # Sort results by views (descending)
+            all_results = sorted(all_results, key=lambda x: x['Views'], reverse=True)
+            
             for result in all_results:
-                st.markdown(
-                    f"**Title:** {result['Title']}  \n"
-                    f"**Description:** {result['Description']}  \n"
-                    f"**URL:** [Watch Video]({result['URL']})  \n"
-                    f"**Views:** {result['Views']}  \n"
-                    f"**Subscribers:** {result['Subscribers']}"
-                )
-                st.write("---")
+                st.markdown(f"""
+                <div class="result-card">
+                    <h3>{result['Title']}</h3>
+                    <p>{result['Description']}...</p>
+                    <p><a href="{result['URL']}" target="_blank">🔗 Watch Video</a></p>
+                    <div>
+                        <span class="metric">👁️ {result['Views']:,} views</span>
+                        <span class="metric">👥 {result['Subscribers']:,} subscribers</span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
         else:
-            st.warning(f"No results found for channels with fewer than {subscriber_threshold} subscribers.")
+            st.warning(f"No results found for channels with fewer than {subscriber_threshold:,} subscribers.")
+            
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.error(f"⚠️ An error occurred: {e}")
+
+# Footer
+st.markdown("""
+<div class="footer">
+    <p>Developed by <b>AbdQuex</b> | © {datetime.now().year}</p>
+</div>
+""", unsafe_allow_html=True)
