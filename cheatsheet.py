@@ -11,54 +11,69 @@ YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels"
 # Custom CSS for better UI
 st.markdown("""
 <style>
+    body, .stApp {
+        color: #222 !important;
+        background-color: #ffffff !important;
+    }
+
     .main-header {
         font-size: 2.5rem;
-        color: #FF0000;
+        color: #d32f2f;
         text-align: center;
         margin-bottom: 1rem;
     }
 
     .section-header {
         font-size: 1.5rem;
-        color: #1E88E5;
+        color: #1565c0;
         margin-top: 1.5rem;
         margin-bottom: 0.5rem;
     }
 
     .app-description {
-        background-color: #f5f5f5;
+        background-color: #e3f2fd;
         padding: 1rem;
         border-radius: 8px;
         margin-bottom: 1.5rem;
+        color: #222;
     }
 
     .result-card {
-        background-color: #fff;
+        background-color: #f9f9f9;
         padding: 1rem;
         border-radius: 8px;
         margin-bottom: 1rem;
-        border: 1px solid #ddd;
+        border: 1px solid #ccc;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        color: #222;
     }
 
     .result-card h3 {
         margin: 0 0 0.5rem;
-        color: #333;
+        color: #111;
     }
 
     .metric {
         display: inline-block;
         margin-right: 1rem;
         padding: 0.25rem 0.5rem;
-        background-color: #e3f2fd;
+        background-color: #bbdefb;
         border-radius: 5px;
+        color: #111;
     }
 
     .footer {
         text-align: center;
         margin-top: 2rem;
         font-size: 0.9rem;
-        color: #666;
+        color: #444;
+        padding: 1rem;
+        border-top: 1px solid #ccc;
+    }
+
+    a {
+        color: #0d47a1 !important;
+        text-decoration: none;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -169,6 +184,6 @@ if fetch_button:
 # Footer
 st.markdown(f"""
 <div class="footer">
-    Developed by <b>AbdQuex</b> | © {datetime.now().year}
+    Developed by <b>AbdQuex</b> | © {datetime.now().year} | <a href="https://abdquex.online" target="_blank">abdquex.online</a>
 </div>
 """, unsafe_allow_html=True)
